@@ -5,7 +5,7 @@ assert(loadfile("/usr/local/include/argos3/plugins/robots/builderbot/lua_library
 
 
 local rules
---local data
+local data
 local behavior
 
 local custom_light_type
