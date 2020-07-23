@@ -23,7 +23,7 @@ end
 --]]
 
 -- sensor condition
---  and tag the block with type = "perpendicular-light" or "parallel-light"
+--  return "perpendicular-light" or "parallel-light" based on robot situation
 local function custom_sensor_condition()
    if robot.id == "builderbot1" then
       return "parallel_light"
@@ -54,7 +54,7 @@ function reset()
       target = {},
       blocks = {},
       obstacles = {},
-      sensor_condition = custom_sensor_condition,
+      sensor_condition = nil,
    }
 
    behavior = robot.utils.behavior_tree.create {
@@ -73,6 +73,7 @@ function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
+   data.sensor_condition = custom_sensor_condition()
 
    -- tick behavior tree
    behavior()
