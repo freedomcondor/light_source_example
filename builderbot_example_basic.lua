@@ -14,12 +14,14 @@ local custom_light_type
 -- the following custom_block_type function defines a type 5 block, whose up face is pink and front face is orange
 -- this function is feed to process_leds(), see the beginning of step()
 -- process_leds() will first calculate default color 01234, and then run the custom function to overwrite the type
+--[[
 local function custom_block_type(block)
    if block.tags.up ~= nil and block.tags.up.type == 1 and 
       block.tags.front ~= nil and block.tags.front.type == 2 then
       return 5
    end
 end
+]]
 
 -- this function factory creates a custom type function, which checks the light condition,
 --  and tag the block with type = "perpendicular-light" or "parallel-light"
