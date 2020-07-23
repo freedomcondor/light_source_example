@@ -21,7 +21,7 @@ local function custom_block_type(block)
       return 5
    end
 end
-]]
+--]]
 
 -- this function factory creates a custom type function, which checks the light condition,
 --  and tag the block with type = "perpendicular-light" or "parallel-light"
