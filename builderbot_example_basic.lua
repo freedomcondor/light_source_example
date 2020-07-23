@@ -5,10 +5,9 @@ assert(loadfile("/usr/local/include/argos3/plugins/robots/builderbot/lua_library
 
 
 local rules
-local data
+--local data
 local behavior
 
-local custom_light_type
 -- in process_leds, user can custom the block type by providing a custom type function
 -- by default the type of a block is 0 1 2 3 4 for black, pink, orange, green, blue
 -- the following custom_block_type function defines a type 5 block, whose up face is pink and front face is orange
@@ -23,16 +22,13 @@ local function custom_block_type(block)
 end
 --]]
 
--- this function factory creates a custom type function, which checks the light condition,
+-- sensor condition
 --  and tag the block with type = "perpendicular-light" or "parallel-light"
-local function create_light_condition_custom_block_type_definer(data)
-   return function(block)
-      if block.type == 0 then return end
-      if data.light == "Y" then
-         return "perpendicular_light"
-      elseif data.light == "X" then
-         return "parallel_light"
-      end
+local function custom_sensor_condition()
+   if robot.id == "builderbot1" then
+      return "parallel_light"
+   elseif robot.id == "builderbot2" then
+      return "perpendicular_light"
    end
 end
 
@@ -58,8 +54,8 @@ function reset()
       target = {},
       blocks = {},
       obstacles = {},
+      sensor_condition = custom_sensor_condition,
    }
-   custom_light_type = create_light_condition_custom_block_type_definer(data)
 
    behavior = robot.utils.behavior_tree.create {
       type = "sequence*",
@@ -73,13 +69,9 @@ function reset()
 end
 
 function step()
-   -- light condition
-   if robot.id == "builderbot1" then data.light = "X" end
-   if robot.id == "builderbot2" then data.light = "Y" end
-
    -- preprocessing
    robot.api.process_blocks(data.blocks)
-   robot.api.process_leds(data.blocks, custom_light_type)
+   robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
 
    -- tick behavior tree

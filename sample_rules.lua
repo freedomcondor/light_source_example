@@ -7,7 +7,7 @@ rules.list = {
       structure = {
          {
             index = vector3(0, 0, 0),
-            type = "parallel_light"
+            type = 0
          },
       },
       target = {
@@ -17,10 +17,11 @@ rules.list = {
    },
    {
       rule_type = 'pickup',
+      sensor_condition = "parallel_light",
       structure = {
          {
             index = vector3(0, 0, 0),
-            type = 0
+            type = 4
          },
       },
       target = {
@@ -28,13 +29,13 @@ rules.list = {
          offset_from_reference = vector3(0, 0, 0),
       },
    },
-
    {
       rule_type = 'place',
+      sensor_condition = "perpendicular_light",
       structure = {
          {
             index = vector3(0, 0, 0),
-            type = "perpendicular_light"
+            type = 4
          },
       },
       target = {
