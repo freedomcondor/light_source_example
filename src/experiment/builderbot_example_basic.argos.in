@@ -35,7 +35,7 @@
         <builderbot_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
-      <params script="builderbot_example_basic.lua" 
+      <params script="@CMAKE_BINARY_DIR@/experiment/builderbot_example_basic.lua" 
               search_random_range="0"/>
     </lua_controller>
 
@@ -47,7 +47,7 @@
       <sensors>
         <radios implementation="default" show_rays="true"/>
       </sensors>
-      <params script="example_block_basic.lua" />
+      <params script="@CMAKE_BINARY_DIR@/experiment/example_block_basic.lua" />
     </lua_controller>
   </controllers>
 
@@ -109,7 +109,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="loop_functions/build/libdc_srocs_loop_functions" label="dc_srocs_loop_functions">
+  <loop_functions library="@CMAKE_BINARY_DIR@/loop_functions/libdc_srocs_loop_functions" label="dc_srocs_loop_functions">
     <lights medium="lights" toggle="1">
       <light id="light0" start="0.5,0,0.25" end="-0.5,0,0.25" duration="10000" />
     </lights>
