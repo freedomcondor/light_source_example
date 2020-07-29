@@ -30,6 +30,9 @@ namespace argos {
       for(const std::string& str : vecToggle) {
          m_vecToggle.push_back(static_cast<UInt32>(std::stoul(str)));
       }
+
+      /* Weixu comment: GetNode(t_tree, "light") here to add lightconfigs into m_vecLightConfig ?? */
+
       /* create lights */
       for(const std::tuple<const char*, CVector3, CColor, Real>& c_config : m_vecLightConfigs) {
          CLightEntity* pcLight = 

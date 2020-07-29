@@ -34,8 +34,12 @@ configure_file(
   )
 
 configure_file(
-  ${CMAKE_SOURCE_DIR}/experiment/builderbot_example_basic.lua.in
+  ${CMAKE_SOURCE_DIR}/experiment/builderbot_example_basic.lua
   ${CMAKE_BINARY_DIR}/experiment/builderbot_example_basic.lua)
+
+configure_file(
+  ${CMAKE_SOURCE_DIR}/experiment/wall_following.lua
+  ${CMAKE_BINARY_DIR}/experiment/wall_following.lua)
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/experiment/example_block_basic.lua
