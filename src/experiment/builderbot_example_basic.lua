@@ -41,7 +41,7 @@ function reset()
       target = {},
       blocks = {},
       obstacles = {},
-      sensor_condition = nil,
+      external_condition = nil,
    }
 
    behavior = robot.utils.behavior_tree.create {
