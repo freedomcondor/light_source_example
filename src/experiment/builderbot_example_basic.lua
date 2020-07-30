@@ -1,11 +1,29 @@
 assert(loadfile("/usr/local/include/argos3/plugins/robots/builderbot/lua_library.luac"))()
 
 
-local rules
+local rules = require("sample_rules")
 --local data
 local behavior
 
-robot.nodes.create_wall_following_node = require("wall_following")
+--robot.nodes.create_wall_following_node = require("wall_following")
+robot.nodes.create_search_block_node = require("wall_following")
+local function custom_external_condition()
+   local front_and_back = robot.rangefinders['1'].illuminance +
+                          robot.rangefinders['12'].illuminance +
+                          robot.rangefinders['6'].illuminance +
+                          robot.rangefinders['7'].illuminance
+
+   local left_and_right = robot.rangefinders['3'].illuminance +
+                          robot.rangefinders['4'].illuminance +
+                          robot.rangefinders['9'].illuminance +
+                          robot.rangefinders['10'].illuminance
+   local error = front_and_back - left_and_right
+   if error > 0 then 
+      return "lights_in_front_and_back"
+   else
+      return "lights_in_left_and_right"
+   end
+end
 
 --- argos functions
 function init()  
@@ -29,7 +47,11 @@ function reset()
    behavior = robot.utils.behavior_tree.create {
       type = "sequence*",
       children = {
-         robot.nodes.create_wall_following_node(data, rules),
+         robot.nodes.create_search_block_node(data, 
+            robot.nodes.create_process_rules_node(data, rules, "pickup")
+         ),
+         robot.nodes.create_curved_approach_block_node(data, 0.20),
+         robot.nodes.create_pick_up_block_node(data, 0.20),
          function() robot.api.move.with_velocity(0,0) return true end,
       }
    }
@@ -40,9 +62,10 @@ function step()
    robot.api.process_blocks(data.blocks)
    robot.api.process_leds(data.blocks)
    robot.api.process_obstacles(data.obstacles, data.blocks)
+   data.external_condition = custom_external_condition()
 
    -- tick behavior tree
-   --behavior()
+   behavior()
 end
 
 function destroy()

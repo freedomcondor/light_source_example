@@ -26,8 +26,8 @@
       </actuators>
       <sensors>
         <builderbot_camera_system implementation="default"
-          show_frustum="false" show_tag_rays="false" show_led_rays="false" />
-        <builderbot_rangefinders implementation="default" show_rays="true" />
+          show_frustum="true" show_tag_rays="true" show_led_rays="false" />
+        <builderbot_rangefinders implementation="default" show_rays="true" light_medium="lights"/>
         <builderbot_differential_drive implementation="default"/>
         <builderbot_electromagnet_system implementation="default" />
         <builderbot_lift_system implementation="default" />
@@ -35,8 +35,7 @@
         <builderbot_system implementation="default" />
         <wifi implementation="default" />
       </sensors>
-      <params script="@CMAKE_BINARY_DIR@/experiment/builderbot_example_basic.lua" 
-              search_random_range="0"/>
+      <params script="@CMAKE_BINARY_DIR@/experiment/builderbot_example_basic.lua" />
     </lua_controller>
 
     <lua_controller id="block">
@@ -74,6 +73,10 @@
       <controller config="builderbot"/>
     </builderbot>
 
+    <block id="block2">
+      <body position="0,0,0" orientation="0,0,0"/>
+      <controller config="block"/>
+    </block>
 <!--
     <builderbot id="builderbot2">
       <body position="0,1.05,0" orientation="-90,0,0"/>
@@ -85,10 +88,6 @@
       <controller config="block"/>
     </block>
 
-    <block id="block2">
-      <body position="-0.055,0,0" orientation="0,0,0"/>
-      <controller config="block"/>
-    </block>
 
     <block id="block3">
       <body position="0,0.555,0" orientation="0,0,0"/>
@@ -114,11 +113,7 @@
   <!-- * Loop functions * -->
   <!-- ****************** -->
   <loop_functions library="@CMAKE_BINARY_DIR@/loop_functions/libdc_srocs_loop_functions" label="dc_srocs_loop_functions">
-    <lights medium="lights" toggle="1">
-      <light id="light0" start="0.5,0,0.25" end="-0.5,0,0.25" duration="10000" />
-      <!--light id="light1" start="0,0.5,0.25" end="0,-0.5,0.25" duration="10000" /-->
-    </lights>
-    <wall id="wall" size="1,10,2" position="0,0,0" />
+    <lights medium="lights" toggle="1, 5, 10" />
   </loop_functions>>
 
   <!-- ********* -->

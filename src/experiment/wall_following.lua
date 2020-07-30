@@ -22,7 +22,7 @@ local check_manipulator_height =
       end,
    }}
 
-return function(data, rules)
+return function(data, rule_node)
    return 
    { type = "sequence", children = {
       -- check height each time
@@ -70,7 +70,7 @@ return function(data, rules)
                return true
             end
          end,
-         -- backup
+         -- backup with tilt
          robot.nodes.create_timer_node(
             function() 
                robot.logger:log_info("back up")
@@ -86,29 +86,42 @@ return function(data, rules)
                return 0.020 / robot.api.parameters.default_speed
             end
          ),
-         -- turn
+         -- turn 210 or align with wall
          robot.nodes.create_timer_node(
             function() 
                robot.api.move.with_bearing(0, robot.api.parameters.default_turn_speed)
-               return 30 / robot.api.parameters.default_turn_speed
+               return 210 / robot.api.parameters.default_turn_speed
+            end,
+            function()
+               distance_threshold = 0.04
+               if robot.rangefinders['3'].proximity < distance_threshold and
+                  robot.rangefinders['4'].proximity < distance_threshold then
+                  robot.api.move.with_bearing(0, 0)
+                  robot.logger:log_info("align with wall")
+                  return false, true
+               else
+                  robot.api.move.with_bearing(0, robot.api.parameters.default_turn_speed)
+                  return true
+               end
             end
          ),
-         function()
-            distance_threshold = 0.04
-            if robot.rangefinders['3'].proximity < distance_threshold and
-               robot.rangefinders['4'].proximity < distance_threshold then
-               robot.api.move.with_bearing(0, 0)
-               robot.logger:log_info("align with wall")
-               return false, true
-            else
-               robot.api.move.with_bearing(0, robot.api.parameters.default_turn_speed)
-               return true
-            end
-         end,
          -- follow the wall
          { type = "selector", children = {
             -- check light condition
-            function() return false, false end,
+            function()
+               local front = robot.rangefinders['1'].illuminance +
+                             robot.rangefinders['12'].illuminance
+               local back = robot.rangefinders['6'].illuminance +
+                            robot.rangefinders['7'].illuminance
+               local error = math.abs(front - back)
+               local tolerance = 0.002
+               if error < tolerance then
+                  robot.logger:log_info("center of the wall")
+                  return false, true
+               else
+                  return false, false
+               end
+            end,
             -- light condition not good, keep following the wall
             { type = "selector", children = {
                -- if nothing in front, forward along the wall
@@ -151,6 +164,66 @@ return function(data, rules)
                function() return false, false end,
             }},
          }},
+         -- turn left and move to center
+         robot.nodes.create_timer_node(
+            function() 
+               robot.api.move.with_bearing(-robot.api.parameters.default_speed, 0)
+               return 0.03 / robot.api.parameters.default_speed
+            end
+         ),
+         robot.nodes.create_timer_node(
+            function() 
+               robot.api.move.with_bearing(robot.api.parameters.default_speed, robot.api.parameters.default_turn_speed)
+               return 90 / robot.api.parameters.default_turn_speed
+            end
+         ),
+         -- move forward and check rules
+         function()
+            robot.api.move.with_bearing(robot.api.parameters.default_speed, 0)
+            return false, true 
+         end,
+         -- check front and rules
+         { type = "sequence", children = {
+            -- if something is in front, turn 180, return false and restart everything
+            { type = "selector*", children = {
+               function()
+                  local distance_threshold = robot.api.parameters.proximity_detect_tolerance -- 0.03
+                  if robot.rangefinders['1'].proximity < distance_threshold or
+                     robot.rangefinders['2'].proximity < distance_threshold or
+                     robot.rangefinders['12'].proximity < distance_threshold or
+                     robot.rangefinders['11'].proximity < distance_threshold then
+                     return false, false
+                  else
+                     return false, true
+                  end
+               end,
+               { type = "sequence*", children = {
+                  -- backup
+                  robot.nodes.create_timer_node(
+                     function() 
+                        robot.api.move.with_bearing(-robot.api.parameters.default_speed, 0)
+                        return 0.05 / robot.api.parameters.default_speed
+                     end
+                  ),
+                  --turn 180
+                  robot.nodes.create_timer_node(
+                     function() 
+                        robot.api.move.with_bearing(0, robot.api.parameters.default_turn_speed)
+                        return 180 / robot.api.parameters.default_turn_speed
+                     end
+                  ),
+                  -- return false
+                  function() return false, false end,
+               }},
+            }},
+            -- everything ok. clear to check rules
+            { type = "selector", children = {
+               --function() robot.logger:log_info("checking") return false, false end,
+               rule_node, -- return true or false
+               --function() robot.logger:log_info("checking false") return false, false end,
+               function() return true end, -- if rule-node doesn't find a match, return running
+            }},
+         }}
       }},
    }}
 end
