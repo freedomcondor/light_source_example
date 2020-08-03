@@ -19,8 +19,12 @@ local function custom_external_condition()
                           robot.rangefinders['10'].illuminance
    local error = front_and_back - left_and_right
    if error > 0 then 
+      robot.utils.draw.arrow("yellow", vector3(0,0,0.02), vector3(0.2, 0, 0.02))
+      robot.utils.draw.arrow("yellow", vector3(0,0,0.02), vector3(-0.2, 0, 0.02))
       return "lights_in_front_and_back"
    else
+      robot.utils.draw.arrow("yellow", vector3(0,0,0.02), vector3(0, 0.2, 0.02))
+      robot.utils.draw.arrow("yellow", vector3(0,0,0.02), vector3(0, -0.2, 0.02))
       return "lights_in_left_and_right"
    end
 end
